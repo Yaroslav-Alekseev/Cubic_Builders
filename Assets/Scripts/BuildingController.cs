@@ -52,12 +52,12 @@ public class BuildingController : MonoBehaviour
         if (builder == null)
             return;
 
-        builder.SetBuilding(this);
+        builder.GoToWarehouse(this);
 
-        Debug.Log(string.Format("Рабочий {0} строит {1}", builder.Name, _name.ToLower())); 
+        Debug.Log(string.Format("Рабочий {0} назначен строить {1}", builder.Name, _name.ToLower())); 
     }
 
-    public void Interact(BuilderController builder/*int metal, int wood, float buildingSpeed*/)
+    public void Interact(BuilderController builder)
     {
         if (_metal < _metalCapacity && builder.Metal > 0)
         {
@@ -81,16 +81,33 @@ public class BuildingController : MonoBehaviour
             _wood += wood;
         }
 
+        int extraMetal = _metal - _metalCapacity;
+        int extraWood = _woodCapacity - _wood;
+
+        if (extraMetal > 0)
+        {
+            builder.Metal += extraMetal;
+            _metal = _metalCapacity;
+        }
+
+        if (extraWood > 0)
+        {
+            builder.Wood += extraWood;
+            _wood = _woodCapacity;
+        }
+
+
         builder.UpdateInfo();
         UpdateInfo();
 
-        bool startBuilding = (_metal == _metalCapacity) && (_wood == _woodCapacity);
+        bool buildingIsReady = (_metal == _metalCapacity) && (_wood == _woodCapacity);
+        bool builderIsReady = (builder.Metal == 0) && (builder.Wood == 0);
 
-        if (startBuilding && builder.Metal == 0 && builder.Wood == 0)
+        if (buildingIsReady && builderIsReady)
             builder.StartBuilding(this);
 
         else
-            builder.ReturnToWarehouse(this, startBuilding);
+            builder.GoToWarehouse(lastBuilding: this);
     }
 
     public void ApplyBuildingProgress(int deltaProgress)
@@ -104,7 +121,7 @@ public class BuildingController : MonoBehaviour
         Vector3 finalPos = BasesController.Instance.FinalShift;
 
         float t = _percentage / 100f;
-        transform.position = Vector3.Lerp(startPos, finalPos, t);
+        transform.localPosition = Vector3.Lerp(startPos, finalPos, t);
 
         UpdateInfo();
     }

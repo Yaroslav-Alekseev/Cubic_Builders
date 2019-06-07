@@ -7,6 +7,7 @@ public class WarehouseController : MonoBehaviour
 {
 
     public Text WarehouseInfo;
+    public float Offset = 2;
     public int MetalCapacity = 100;
     public int WoodCapacity = 600;
     public string Name;
@@ -32,4 +33,56 @@ public class WarehouseController : MonoBehaviour
 
         WarehouseInfo.text = info;
     }
+
+    public void Interact(BuilderController builder, BuildingController lastBuilding)
+    {
+
+        //action with builder
+        if (builder.Metal > 0 || builder.Wood > 0)
+        {
+            Metal += builder.Metal;
+            Wood += builder.Wood;
+
+            builder.Metal = 0;
+            builder.Wood = 0;
+        }
+        else
+        {
+            int metal = Metal - builder.MetalCapacity;
+
+            if (metal < 0)
+                metal = Metal;
+
+            builder.Metal += metal;
+            Metal -= metal;
+
+
+            int wood = Wood - builder.WoodCapacity;
+
+            if (wood < 0)
+                wood = Wood;
+
+            builder.Wood += wood;
+            Wood -= wood;
+        }
+
+
+        //check is warehouse empty or not
+        if (Metal == 0 && Wood == 0)
+        {
+            if (WarehousesList.ActiveWarehouses.Contains(this))
+                WarehousesList.ActiveWarehouses.Remove(this);
+        }
+        else
+        {
+            if (!WarehousesList.ActiveWarehouses.Contains(this))
+                WarehousesList.ActiveWarehouses.Add(this);
+        }
+
+        builder.UpdateInfo();
+        UpdateInfo();
+
+        builder.GoToLastBuilding(lastBuilding);
+    }
+
 }

@@ -3,8 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum Direction
+{
+    none,
+    toBuilding,
+    toWarehouse
+}
+
 public class BuilderController : MonoBehaviour
 {
+
     public GameObject Selection;
     public GameObject MetalCube;
     public GameObject WoodenCube;
@@ -19,16 +27,22 @@ public class BuilderController : MonoBehaviour
     [HideInInspector]
     public int Metal, Wood;
 
-    private BuildingController _target;
+    private BuildingController _nextBuilding, _lastBuilding;
+    private WarehouseController _nextWarehouse;
     private Vector3 _startPoint, _targetPoint;
     private float _path, _offset;
     private bool _isMoving;
+    private Direction _direction;
+    private int _index;
 
     private static BuilderController _selectedBuilder;
 
 
     private void Awake()
     {
+        _direction = Direction.none;
+        _index = Random.Range(0, 1);
+
         UpdateInfo();
     }
 
@@ -87,19 +101,30 @@ public class BuilderController : MonoBehaviour
             _startPoint = transform.position;
             _path = 0;
 
-            _target.Interact(this);
+            switch(_direction)
+            {
+                case Direction.toBuilding:
+                    _nextBuilding.Interact(this);
+                    break;
+                case Direction.toWarehouse:
+                    _nextWarehouse.Interact(this, _lastBuilding);
+                    break;
+            }
+
+            //_direction = Direction.none;
         }
     }
 
-    public void SetBuilding(BuildingController building)
+    private void GoToBuilding(BuildingController target)
     {
-        _target = building;
+        _direction = Direction.toBuilding;
+        _nextBuilding = target;
 
         _startPoint = transform.position;
-        _targetPoint = building.transform.position;
+        _targetPoint = target.transform.position;
         _targetPoint.y = _startPoint.y;
 
-        _offset = building.Offset;
+        _offset = target.Offset;
         _path = 0;
 
         _isMoving = true;
@@ -117,9 +142,26 @@ public class BuilderController : MonoBehaviour
         WoodenCube.SetActive(Wood > 0);
     }
 
-    public void ReturnToWarehouse(BuildingController lastBuilding, bool startBuilding)
+    public void GoToWarehouse(BuildingController lastBuilding)
     {
-        ///
+        _direction = Direction.toWarehouse;
+        _lastBuilding = lastBuilding;
+
+        _nextWarehouse = GetNextWarehouse(); 
+
+        _startPoint = transform.position;
+        _targetPoint = _nextWarehouse.transform.position;
+        _targetPoint.y = _startPoint.y;
+
+        _offset = _nextWarehouse.Offset;
+        _path = 0;
+
+        _isMoving = true;
+    }
+
+    public void GoToLastBuilding(BuildingController target)
+    {
+        GoToBuilding(_lastBuilding);
     }
 
     public void StartBuilding(BuildingController building)
@@ -139,6 +181,18 @@ public class BuilderController : MonoBehaviour
             building.ApplyBuildingProgress(BuildingSpeed);
             yield return new WaitForSecondsRealtime(1f);
         }
+    }
+
+    private WarehouseController GetNextWarehouse()  
+    {
+        int maxIndex = WarehousesList.ActiveWarehouses.Count;
+        if (_index >= maxIndex)
+            _index = 0;
+
+        var warehouse = WarehousesList.ActiveWarehouses[_index];
+        _index++;
+
+        return warehouse;
     }
 
 }
