@@ -52,7 +52,7 @@ public class BuildingController : MonoBehaviour
         if (builder == null)
             return;
 
-        builder.SetTarget(this);
+        builder.SetBuilding(this);
 
         Debug.Log(string.Format("Рабочий {0} строит {1}", builder.Name, _name.ToLower())); 
     }

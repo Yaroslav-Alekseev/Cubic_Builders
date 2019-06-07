@@ -1,15 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BuilderController : MonoBehaviour
 {
     public GameObject Selection;
     public GameObject MetalCube;
     public GameObject WoodenCube;
+    public Text BuilderInfo;
+    [Space]
+    public int MetalCapacity = 50;
+    public int WoodCapacity = 100;
     public int BuildingSpeed = 10;
     public float MovementSpeed = 0.01f;
-    public string Name = "Builder##";
+    public string Name = "Строитель##";
 
     [HideInInspector]
     public int Metal, Wood;
@@ -86,15 +91,15 @@ public class BuilderController : MonoBehaviour
         }
     }
 
-    public void SetTarget(BuildingController target)
+    public void SetBuilding(BuildingController building)
     {
-        _target = target;
+        _target = building;
 
         _startPoint = transform.position;
-        _targetPoint = target.transform.position;
+        _targetPoint = building.transform.position;
         _targetPoint.y = _startPoint.y;
 
-        _offset = target.Offset;
+        _offset = building.Offset;
         _path = 0;
 
         _isMoving = true;
@@ -102,8 +107,12 @@ public class BuilderController : MonoBehaviour
 
     public void UpdateInfo()
     {
-        ///INFO TEXT
-        
+        string info = Name + "\n";
+        info += string.Format(" - м. {0}/{1};\n", Metal, MetalCapacity);
+        info += string.Format(" - д. {0}/{1};\n", Wood, WoodCapacity);
+
+        BuilderInfo.text = info;
+
         MetalCube.SetActive(Metal > 0);
         WoodenCube.SetActive(Wood > 0);
     }
