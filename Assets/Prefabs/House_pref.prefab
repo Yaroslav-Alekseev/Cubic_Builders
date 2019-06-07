@@ -286,3 +286,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BuildingInfo: {fileID: 898495738}
   Type: 0
+  Offset: 2

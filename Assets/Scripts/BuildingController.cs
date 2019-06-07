@@ -8,6 +8,7 @@ public class BuildingController : MonoBehaviour
 
     public Text BuildingInfo;
     public BuildingType Type;
+    public float Offset = 2;
 
     private int _metal, _wood, _percentage;
     private int _metalCapacity, _woodCapacity;
@@ -46,10 +47,17 @@ public class BuildingController : MonoBehaviour
 
     private void BindBuilder()
     {
-        Debug.Log("Рабочий Х начал строить " + _name.ToLower()); 
+        var builder = BuilderController.GetSelectedBuilder();
+
+        if (builder == null)
+            return;
+
+        builder.SetTarget(this);
+
+        Debug.Log(string.Format("Рабочий {0} строит {1}", builder.Name, _name.ToLower())); 
     }
 
-    public void Build(int metal, int wood, float buildingSpeed)
+    public void Interact(BuilderController builder/*int metal, int wood, float buildingSpeed*/)
     {
         UpdateInfo();
     }

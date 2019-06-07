@@ -209,12 +209,17 @@ PrefabInstance:
     - target: {fileID: 7477312049648474186, guid: eaecf2f2adfe83149b45a4ddff4213e8,
         type: 3}
       propertyPath: Name
-      value: Builder00
+      value: Builder01
+      objectReference: {fileID: 0}
+    - target: {fileID: 7477312049648474186, guid: eaecf2f2adfe83149b45a4ddff4213e8,
+        type: 3}
+      propertyPath: MovementSpeed
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 8514675992131145503, guid: eaecf2f2adfe83149b45a4ddff4213e8,
         type: 3}
       propertyPath: m_Name
-      value: Builder00
+      value: Builder01
       objectReference: {fileID: 0}
     - target: {fileID: 8514675992131145499, guid: eaecf2f2adfe83149b45a4ddff4213e8,
         type: 3}
@@ -484,12 +489,17 @@ PrefabInstance:
     - target: {fileID: 7477312049648474186, guid: eaecf2f2adfe83149b45a4ddff4213e8,
         type: 3}
       propertyPath: Name
-      value: Builder02
+      value: Builder03
+      objectReference: {fileID: 0}
+    - target: {fileID: 7477312049648474186, guid: eaecf2f2adfe83149b45a4ddff4213e8,
+        type: 3}
+      propertyPath: MovementSpeed
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 8514675992131145503, guid: eaecf2f2adfe83149b45a4ddff4213e8,
         type: 3}
       propertyPath: m_Name
-      value: Builder02
+      value: Builder03
       objectReference: {fileID: 0}
     - target: {fileID: 8514675992131145499, guid: eaecf2f2adfe83149b45a4ddff4213e8,
         type: 3}
@@ -559,6 +569,11 @@ PrefabInstance:
         type: 3}
       propertyPath: Name
       value: Builder04
+      objectReference: {fileID: 0}
+    - target: {fileID: 7477312049648474186, guid: eaecf2f2adfe83149b45a4ddff4213e8,
+        type: 3}
+      propertyPath: MovementSpeed
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 8514675992131145503, guid: eaecf2f2adfe83149b45a4ddff4213e8,
         type: 3}
@@ -1737,12 +1752,17 @@ PrefabInstance:
     - target: {fileID: 7477312049648474186, guid: eaecf2f2adfe83149b45a4ddff4213e8,
         type: 3}
       propertyPath: Name
-      value: Builder01
+      value: Builder02
+      objectReference: {fileID: 0}
+    - target: {fileID: 7477312049648474186, guid: eaecf2f2adfe83149b45a4ddff4213e8,
+        type: 3}
+      propertyPath: MovementSpeed
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 8514675992131145503, guid: eaecf2f2adfe83149b45a4ddff4213e8,
         type: 3}
       propertyPath: m_Name
-      value: Builder01
+      value: Builder02
       objectReference: {fileID: 0}
     - target: {fileID: 8514675992131145499, guid: eaecf2f2adfe83149b45a4ddff4213e8,
         type: 3}
