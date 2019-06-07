@@ -110,8 +110,6 @@ public class BuilderController : MonoBehaviour
                     _nextWarehouse.Interact(this, _lastBuilding);
                     break;
             }
-
-            //_direction = Direction.none;
         }
     }
 
