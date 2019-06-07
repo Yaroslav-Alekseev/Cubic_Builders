@@ -1,69 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public enum BuildingType
-{
-    house,
-    barn
-}
+using UnityEngine.UI;
 
 public class BuildingController : MonoBehaviour
 {
-    public Transform[] BasesList;
-    [Space]
-    public Vector3 DefaultShift = new Vector3(0, -0.9f, 0);
 
-    public static BuildingController Instance;
+    public Text BuildingInfo;
+    public string Name;
+    public int MetalCapacity;
+    public int WoodCapacity;
 
-    private List<Transform> _vacantBases = new List<Transform>();
+    private int _metal, _wood, _percentage;
 
 
     private void Awake()
     {
-        Instance = this;
-    
-        foreach (var bl in BasesList)
-            _vacantBases.Add(bl);
+        _metal = 0;
+        _wood = 0;
+        _percentage = 0;
+
+        UpdateInfo();
     }
 
 
-    public GameObject SetBuilding(BuildingType buildingType)
+    private void UpdateInfo()
     {
-        GameObject prefab;
+        string info = Name + "\n";
+        info += string.Format(" - м. {0}/{1};\n", _metal, MetalCapacity);
+        info += string.Format(" - д. {0}/{1};\n", _wood, WoodCapacity);
+        info += string.Format(" (завершён на {0}%)\n", _percentage);
 
-        switch(buildingType)
-        {
-            case BuildingType.house:
-                prefab = PrefabsCollection.Instance.HousePrefab;
-                break;
-
-            case BuildingType.barn:
-                prefab = PrefabsCollection.Instance.BarnPrefab;
-                break;
-
-            default:
-                return null;
-        }
-
-
-        Transform parent; 
-
-        if (_vacantBases.Count > 0)
-        {
-            parent = _vacantBases[0];
-            _vacantBases.Remove(parent);
-        }
-        else
-        {
-            return null;
-        }
-
-        GameObject building = Instantiate(prefab, parent.position + DefaultShift, Quaternion.identity);
-        building.transform.SetParent(parent, true);
-
-        Debug.Log(buildingType + " is building!");
-        return building;
+        BuildingInfo.text = info;
     }
+
 
 }

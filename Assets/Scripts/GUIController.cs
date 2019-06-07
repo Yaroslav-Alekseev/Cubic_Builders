@@ -7,12 +7,12 @@ public class GUIController : MonoBehaviour
     
     public void BuildHouse()
     {
-        BuildingController.Instance.SetBuilding(BuildingType.house);
+        BasesController.Instance.SetBuilding(BuildingType.house);
     }
 
     public void BuildBarn()
     {
-        BuildingController.Instance.SetBuilding(BuildingType.barn);
+        BasesController.Instance.SetBuilding(BuildingType.barn);
     }
 
 }
