@@ -29,6 +29,11 @@ public class BuildingController : MonoBehaviour
     }
 
 
+    private void OnMouseDown()
+    {
+        BindBuilder();
+    }
+
     private void UpdateInfo()
     {
         string info = _name + "\n";
@@ -39,5 +44,14 @@ public class BuildingController : MonoBehaviour
         BuildingInfo.text = info;
     }
 
+    private void BindBuilder()
+    {
+        Debug.Log("Рабочий Х начал строить " + _name.ToLower()); 
+    }
+
+    public void Build(int metal, int wood, float buildingSpeed)
+    {
+        UpdateInfo();
+    }
 
 }

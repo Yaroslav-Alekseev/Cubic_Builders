@@ -5,6 +5,7 @@ using UnityEngine;
 public class BuilderController : MonoBehaviour
 {
     public GameObject Selection;
+    public float BuildingSpeed = 10;
     public string Name = "Builder##";
 
     private static BuilderController _selectedBuilder;
