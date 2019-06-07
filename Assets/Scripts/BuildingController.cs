@@ -59,7 +59,61 @@ public class BuildingController : MonoBehaviour
 
     public void Interact(BuilderController builder/*int metal, int wood, float buildingSpeed*/)
     {
+        if (_metal < _metalCapacity && builder.Metal > 0)
+        {
+            int metal = builder.Metal - (_metalCapacity - _metal);
+
+            if (metal < 0)
+                metal = builder.Metal;
+
+            builder.Metal -= metal;
+            _metal += metal;
+        }
+
+        if (_wood < _woodCapacity && builder.Wood > 0)
+        {
+            int wood = builder.Wood - (_woodCapacity - _wood);
+
+            if (wood < 0)
+                wood = builder.Wood;
+
+            builder.Wood -= wood;
+            _wood += wood;
+        }
+
+        builder.UpdateInfo();
+        UpdateInfo();
+
+        bool startBuilding = (_metal == _metalCapacity) && (_wood == _woodCapacity);
+
+        if (startBuilding && builder.Metal == 0 && builder.Wood == 0)
+            builder.StartBuilding(this);
+
+        else
+            builder.ReturnToWarehouse(this, startBuilding);
+    }
+
+    public void ApplyBuildingProgress(int deltaProgress)
+    {
+        _percentage += deltaProgress;
+
+        if (_percentage > 100)
+            _percentage = 100;
+
+        Vector3 startPos = BasesController.Instance.DefaultShift;
+        Vector3 finalPos = BasesController.Instance.FinalShift;
+
+        float t = _percentage / 100f;
+        transform.position = Vector3.Lerp(startPos, finalPos, t);
+
         UpdateInfo();
     }
 
+    public int GetPercetage()
+    {
+        return _percentage;
+    }
+
 }
+
+

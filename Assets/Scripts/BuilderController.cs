@@ -5,9 +5,14 @@ using UnityEngine;
 public class BuilderController : MonoBehaviour
 {
     public GameObject Selection;
-    public float BuildingSpeed = 10;
+    public GameObject MetalCube;
+    public GameObject WoodenCube;
+    public int BuildingSpeed = 10;
     public float MovementSpeed = 0.01f;
     public string Name = "Builder##";
+
+    [HideInInspector]
+    public int Metal, Wood;
 
     private BuildingController _target;
     private Vector3 _startPoint, _targetPoint;
@@ -16,6 +21,11 @@ public class BuilderController : MonoBehaviour
 
     private static BuilderController _selectedBuilder;
 
+
+    private void Awake()
+    {
+        UpdateInfo();
+    }
 
     private void Update()
     {
@@ -88,6 +98,38 @@ public class BuilderController : MonoBehaviour
         _path = 0;
 
         _isMoving = true;
+    }
+
+    public void UpdateInfo()
+    {
+        ///INFO TEXT
+        
+        MetalCube.SetActive(Metal > 0);
+        WoodenCube.SetActive(Wood > 0);
+    }
+
+    public void ReturnToWarehouse(BuildingController lastBuilding, bool startBuilding)
+    {
+        ///
+    }
+
+    public void StartBuilding(BuildingController building)
+    {
+        StartCoroutine(BuildingProcess(building));
+    }
+
+    private void StopBuilding()
+    {
+        StopCoroutine(BuildingProcess(null));
+    }
+
+    private IEnumerator BuildingProcess(BuildingController building)
+    {
+        while (building.GetPercetage() < 100)
+        {
+            building.ApplyBuildingProgress(BuildingSpeed);
+            yield return new WaitForSecondsRealtime(1f);
+        }
     }
 
 }
