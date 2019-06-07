@@ -2,12 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum BuildingType
-{
-    house,
-    barn
-}
-
 public class BasesController : MonoBehaviour
 {
     public Transform[] BasesList;

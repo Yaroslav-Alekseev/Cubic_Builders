@@ -285,6 +285,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BuildingInfo: {fileID: 898495738}
-  Name: "\u0414\u043E\u043C"
-  MetalCapacity: 200
-  WoodCapacity: 800
+  Type: 0
