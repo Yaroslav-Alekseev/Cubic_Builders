@@ -64,7 +64,7 @@ public class BuilderController : MonoBehaviour
     {
         _selectedBuilder = this;
         Selection.SetActive(true);
-        Debug.Log(this.Name + " selected!");
+        Debug.Log(this.Name + ": выбран!");
     }
 
     public static void DeSelectLastBuilder()
@@ -73,7 +73,7 @@ public class BuilderController : MonoBehaviour
             return;
         
         _selectedBuilder.Selection.SetActive(false);
-        Debug.Log(_selectedBuilder.Name + " deselected!");
+        Debug.Log(_selectedBuilder.Name + ": выбор отменён.");
         _selectedBuilder = null;
     }
 
@@ -115,7 +115,7 @@ public class BuilderController : MonoBehaviour
         }
     }
 
-    private void GoToBuilding(BuildingController target)
+    public void GoToBuilding(BuildingController target)
     {
         _direction = Direction.toBuilding;
         _nextBuilding = target;

@@ -52,9 +52,12 @@ public class BuildingController : MonoBehaviour
         if (builder == null)
             return;
 
-        builder.GoToWarehouse(this);
+        if (_metal < _metalCapacity || _wood < _woodCapacity)
+            builder.GoToWarehouse(this);
+        else
+            builder.GoToBuilding(this);
 
-        Debug.Log(string.Format("Рабочий {0} назначен строить {1}", builder.Name, _name.ToLower())); 
+        Debug.Log(string.Format("{0} назначен строить {1}.", builder.Name, _name.ToLower())); 
     }
 
     public void Interact(BuilderController builder)
@@ -96,7 +99,6 @@ public class BuildingController : MonoBehaviour
             _wood = _woodCapacity;
         }
 
-
         builder.UpdateInfo();
         UpdateInfo();
 
@@ -114,8 +116,11 @@ public class BuildingController : MonoBehaviour
     {
         _percentage += deltaProgress;
 
-        if (_percentage > 100)
+        if (_percentage >= 100)
+        {
             _percentage = 100;
+            Debug.Log(string.Format(_name + " построен."));
+        }
 
         Vector3 startPos = BasesController.Instance.DefaultShift;
         Vector3 finalPos = BasesController.Instance.FinalShift;

@@ -57,7 +57,8 @@ public class BasesController : MonoBehaviour
         GameObject building = Instantiate(prefab, parent.position + DefaultShift, Quaternion.identity);
         building.transform.SetParent(parent, true);
 
-        Debug.Log(buildingType + " is building!");
+        string name = BuildingsConfig.GetName(buildingType);
+        Debug.Log("Готова площадка под " + name.ToLower() + ".");
         return building;
     }
 
