@@ -38,38 +38,66 @@ public class WarehouseController : MonoBehaviour
     {
 
         //action with builder
-        if (builder.Metal > 0 || builder.Wood > 0)
+        if (builder.ReturnMaterials)
         {
             Metal += builder.Metal;
             Wood += builder.Wood;
 
             builder.Metal = 0;
             builder.Wood = 0;
+
+            builder.ReturnMaterials = false;
         }
         else
         {
-            int metal = Metal - builder.MetalCapacity;
+            int metal = Metal - (builder.MetalCapacity - builder.Metal);
 
             if (metal < 0)
+            {
                 metal = Metal;
+                Metal = 0;
+            }
+            else
+            {
+                Metal -= metal;
+            }
 
             builder.Metal += metal;
-            Metal -= metal;
+
+            if (Metal > MetalCapacity)
+            {
+                builder.Metal += Metal - MetalCapacity;
+                Metal = MetalCapacity;
+            }
 
 
-            int wood = Wood - builder.WoodCapacity;
+            int wood = Wood - (builder.WoodCapacity - builder.Wood);
 
             if (wood < 0)
+            {
                 wood = Wood;
+                Wood = 0;
+            }
+            else
+            {
+                Wood -= wood;
+            }
 
             builder.Wood += wood;
-            Wood -= wood;
+
+            if (Wood > WoodCapacity)
+            {
+                builder.Wood += Wood - WoodCapacity;
+                Wood = WoodCapacity;
+            }
         }
 
 
         //check is warehouse empty or not
-        if (Metal == 0 && Wood == 0)
+        if (Metal <= 0 && Wood <= 0)
         {
+            Metal = 0;
+            Wood = 0;
             if (WarehousesList.ActiveWarehouses.Contains(this))
                 WarehousesList.ActiveWarehouses.Remove(this);
         }

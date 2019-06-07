@@ -71,6 +71,12 @@ public class BuildingController : MonoBehaviour
 
             builder.Metal -= metal;
             _metal += metal;
+
+            if (_metal > _metalCapacity)
+            {
+                builder.Metal += _metal - _metalCapacity;
+                _metal = _metalCapacity;
+            }
         }
 
         if (_wood < _woodCapacity && builder.Wood > 0)
@@ -82,22 +88,14 @@ public class BuildingController : MonoBehaviour
 
             builder.Wood -= wood;
             _wood += wood;
+
+            if (_wood > _woodCapacity)
+            {
+                builder.Wood += _wood - _woodCapacity;
+                _wood = _woodCapacity;
+            }
         }
 
-        int extraMetal = _metal - _metalCapacity;
-        int extraWood = _woodCapacity - _wood;
-
-        if (extraMetal > 0)
-        {
-            builder.Metal += extraMetal;
-            _metal = _metalCapacity;
-        }
-
-        if (extraWood > 0)
-        {
-            builder.Wood += extraWood;
-            _wood = _woodCapacity;
-        }
 
         builder.UpdateInfo();
         UpdateInfo();
@@ -106,10 +104,16 @@ public class BuildingController : MonoBehaviour
         bool builderIsReady = (builder.Metal == 0) && (builder.Wood == 0);
 
         if (buildingIsReady && builderIsReady)
+        {
             builder.StartBuilding(this);
-
+        }
         else
+        {
+            if (buildingIsReady)
+                builder.ReturnMaterials = true;
+
             builder.GoToWarehouse(lastBuilding: this);
+        }
     }
 
     public void ApplyBuildingProgress(int deltaProgress)

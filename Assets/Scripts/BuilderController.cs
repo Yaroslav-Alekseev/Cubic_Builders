@@ -26,6 +26,8 @@ public class BuilderController : MonoBehaviour
 
     [HideInInspector]
     public int Metal, Wood;
+    [HideInInspector]
+    public bool ReturnMaterials = false;
 
     private BuildingController _nextBuilding, _lastBuilding;
     private WarehouseController _nextWarehouse;
@@ -145,7 +147,9 @@ public class BuilderController : MonoBehaviour
         _direction = Direction.toWarehouse;
         _lastBuilding = lastBuilding;
 
-        _nextWarehouse = GetNextWarehouse(); 
+        _nextWarehouse = GetNextWarehouse();
+        if (_nextWarehouse == null)
+            return;
 
         _startPoint = transform.position;
         _targetPoint = _nextWarehouse.transform.position;
@@ -184,10 +188,18 @@ public class BuilderController : MonoBehaviour
     private WarehouseController GetNextWarehouse()  
     {
         int maxIndex = WarehousesList.ActiveWarehouses.Count;
+        WarehouseController warehouse = null;
+
+        if (maxIndex == 0)
+        {
+            warehouse = WarehousesList.Instance.WareHouses[0];
+            return warehouse;
+        }
+
         if (_index >= maxIndex)
             _index = 0;
 
-        var warehouse = WarehousesList.ActiveWarehouses[_index];
+        warehouse = WarehousesList.ActiveWarehouses[_index];
         _index++;
 
         return warehouse;
