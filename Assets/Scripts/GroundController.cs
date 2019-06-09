@@ -3,6 +3,9 @@ using UnityEngine.EventSystems;
 
 public class GroundController : MonoBehaviour
 {
+    /// <summary>
+    /// Обрабатывает клики по земле
+    /// </summary>
 
     private void OnMouseDown()
     {

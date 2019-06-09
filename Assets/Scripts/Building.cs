@@ -5,6 +5,10 @@ using UnityEngine.UI;
 
 public abstract class Building : MonoBehaviour
 {
+    /// <summary>
+    /// Базовый класс для всех типов зданий
+    /// </summary>
+
     [HideInInspector]
     public int Metal, Wood, Percentage;
     public int MetalCapacity, WoodCapacity;
@@ -23,6 +27,7 @@ public abstract class Building : MonoBehaviour
     }
 
     public virtual void UpdateInfo()
+    //Обновляет инфу над зданиями
     {
         string info = Name + "\n";
         info += string.Format(" - м. {0}/{1};\n", Metal, MetalCapacity);

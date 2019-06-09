@@ -19,6 +19,9 @@ public class Capacity
 
 public class BuildingsConfig
 {
+    /// <summary>
+    /// Хранит стандартную информацию для каждого типа зданий
+    /// </summary>
 
     private static Dictionary<BuildingType, string> _names = new Dictionary<BuildingType, string>()
     {

@@ -1249,7 +1249,7 @@ GameObject:
   - component: {fileID: 1733998798}
   - component: {fileID: 1733998800}
   m_Layer: 0
-  m_Name: CONTROLLERS
+  m_Name: SINGLETONS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

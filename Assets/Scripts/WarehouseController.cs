@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class WarehouseController : Building
 {
+    /// <summary>
+    /// Управляет зданиями складов
+    /// </summary>
 
     protected new void Awake()
     {
@@ -15,6 +18,7 @@ public class WarehouseController : Building
     }
 
     public void CheckIsEmptyOrNot()
+    //проверяет, есть ли на складе ресурсы
     {
         var activeWarehouses = WarehousesList.ActiveWarehouses;
 

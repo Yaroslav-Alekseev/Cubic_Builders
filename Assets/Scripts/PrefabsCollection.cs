@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class PrefabsCollection : MonoBehaviour
 {
+    /// <summary>
+    /// Коллекция префабов зданий; синглтон
+    /// </summary>
+
     public GameObject HousePrefab;
     public GameObject BarnPrefab;
 

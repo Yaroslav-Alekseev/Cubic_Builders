@@ -6,6 +6,10 @@ using System;
 
 public class BuilderController : MonoBehaviour
 {
+    /// <summary>
+    /// Управляет строителем: его перемещением и действиями
+    /// </summary>
+
     public GameObject Selection, MetalCube, WoodenCube;
     public Text BuilderInfo;
     [HideInInspector]
@@ -49,7 +53,7 @@ public class BuilderController : MonoBehaviour
 
         if (_assignedBuilding != null && _assignedBuilding is BuildingController)
         {
-            ((BuildingController)_assignedBuilding).OnBuildingFinished -= ReturnToDefaultPos;
+            ((BuildingController)_assignedBuilding).OnBuildingFinished -= ReturnToDefaultPos; //отписывается от событий построенного здания
             Debug.Log(Name + ": отписка от " + _assignedBuilding.Name);
         }
     }
@@ -61,6 +65,7 @@ public class BuilderController : MonoBehaviour
     }
 
     private void Select()
+    //выбрать и подсветить рабочего по щелчку мыши
     {
         if (SelectedBuilder == this)
             return;
@@ -73,6 +78,7 @@ public class BuilderController : MonoBehaviour
     }
 
     public static void DeSelectLastBuilder()
+    //снять выделение с последнего выбранного рабочего
     {
         if (SelectedBuilder == null)
             return;
@@ -86,6 +92,7 @@ public class BuilderController : MonoBehaviour
 
 
     public void UpdateInfo()
+    //обновить надписи и индкаторы над "головой" рабочего
     {
         string info = Name + "\n";
         info += string.Format(" - м. {0}/{1};\n", Metal, MetalCapacity);
@@ -98,12 +105,14 @@ public class BuilderController : MonoBehaviour
     }
 
     private void Stop(Building building)
+    //прервать движение рабочего
     {
         _isMoving = false;
         _progress = 0;
     }
 
     public void AssignToBuilding(Building building)
+    //назначить строителя на постройку (дома/амбара)
     {
         _returnMaterials = false;
 
@@ -127,6 +136,7 @@ public class BuilderController : MonoBehaviour
     }
 
     private void GoToBuilding(Building building)
+    //отправить  строителя к зданию (дому/амбару/складу)
     {
         _target = building;
 
@@ -140,8 +150,9 @@ public class BuilderController : MonoBehaviour
     }
 
     private void TakeMaterials(Building building)
+    //строитель берёт материалы (со склада)
     {
-        //take metal
+        //берёт металл
         int metal = MetalCapacity - Metal;
 
         if (metal > building.Metal)
@@ -150,7 +161,7 @@ public class BuilderController : MonoBehaviour
         Metal += metal;
         building.Metal -= metal;
 
-        //take wood
+        //берёт дерево
         int wood = WoodCapacity - Wood;
 
         if (wood > building.Wood)
@@ -159,15 +170,16 @@ public class BuilderController : MonoBehaviour
         Wood += wood;
         building.Wood -= wood;
 
-        //update info
+        //обновить индикаторы строителя и лог
         UpdateInfo();
 
         Debug.Log(string.Format("{0} взял со склада {1} ед. металла и {2} ед. дерева", Name, metal, wood));
     }
 
     private void GiveMaterials(Building building)
+    //строитель вкладывает материалы в здание (дом/амбар/склад)
     {
-        //give metal
+        //вкладывает металл
         int metal = building.MetalCapacity - building.Metal;
 
         if (metal > Metal)
@@ -176,7 +188,7 @@ public class BuilderController : MonoBehaviour
         Metal -= metal;
         building.Metal += metal;
 
-        //give wood
+        //вкладывает дерево 
         int wood = building.WoodCapacity - building.Wood;
 
         if (wood > Wood)
@@ -185,26 +197,27 @@ public class BuilderController : MonoBehaviour
         Wood -= wood;
         building.Wood += wood;
 
-        //update info
+        //обновить индикаторы строителя и лог
         UpdateInfo();
 
         Debug.Log(string.Format("{0} вложил в {1} {2} ед. металла и {3} ед. дерева", Name, building.Name.ToLower(), metal, wood));
     }
 
     private void Interact(Building target)
+    //строитель взаимодействует со зданиями
     {
         switch(target.Type)
         {
-            case BuildingType.warehouse: //склад
+            case BuildingType.warehouse: //взаимодействует со складом
 
                 var warehouse = target as WarehouseController;
 
-                if (_returnMaterials)
+                if (_returnMaterials) //возвращает материалы на склад
                 {
                     GiveMaterials(warehouse);
                     _returnMaterials = false;
                 }
-                else
+                else //берёт материалы со склада
                 {
                     TakeMaterials(warehouse);
                 }
@@ -217,35 +230,36 @@ public class BuilderController : MonoBehaviour
                 break;
 
 
-            case BuildingType.house: //дом или амбар
-            case BuildingType.barn:
+            case BuildingType.house: //взаимодействует с домом
+            case BuildingType.barn: // или амбаром
 
                 var building = target as BuildingController;
 
-                GiveMaterials(target);
+                GiveMaterials(target); //вкладывает матералы в стройку (дома/амбара)
                 target.UpdateInfo();
 
-                if (target.IsReady)
+                if (target.IsReady) //начинает стройку, если она накопила материалы
                 {
-                    if (Metal == 0 && Wood == 0)
+                    if (Metal == 0 && Wood == 0) //начало стройки
                         StartBuilding(target as BuildingController);
-                    else
-                        ReturnMaterials();
+                    else //если остались лишние материалы, то возвращает их на склад
+                        ReturnMaterials(); 
                 }
-                else
+                else //идёт на склад за недостающими материалами
                 {
                     warehouse = GetNextWarehouse();
                     GoToBuilding(warehouse);
                 }
                 break;
 
-            default: //исходная позиция
+            default: //строитель вернулся в исходную позицию
                 Debug.Log(Name + " вернулся на исходную позицию.");
                 break;
         }
     }
 
     private void MoveBuilder()
+    //перемещает строителя из стартовой позиции к цели (с учётом отступа)
     {
         if (!_isMoving)
             return;
@@ -275,6 +289,7 @@ public class BuilderController : MonoBehaviour
     }
 
     public void ReturnToDefaultPos()
+    //после завершения стройки строитель возвращается на исходну позицию
     {
         _startPoint = transform.position;
         _targetPoint = _defaultPos;
@@ -285,6 +300,7 @@ public class BuilderController : MonoBehaviour
     }
 
     public void ReturnMaterials()
+    //строитель возвращает на склад излишки материалов
     {
         _returnMaterials = true;
         var warehouse = GetNextWarehouse();
@@ -292,6 +308,7 @@ public class BuilderController : MonoBehaviour
     }
 
     private WarehouseController GetNextWarehouse()
+    //строитель выбирает склад, к которому он пойдёт
     {
         int maxIndex = WarehousesList.ActiveWarehouses.Count;
         WarehouseController warehouse = null;
@@ -313,17 +330,20 @@ public class BuilderController : MonoBehaviour
 
 
     public void StartBuilding(BuildingController building)
+    //строитель начинает строит здание (дом/амбар)
     {
         StartCoroutine(BuildingProcess(building));
         building.OnBuildingFinished += ReturnToDefaultPos;
     }
 
     private void StopBuilding()
+    //строитель перестаёт строить здание
     {
         StopCoroutine(BuildingProcess(null));
     }
 
     private IEnumerator BuildingProcess(BuildingController building)
+    //процесс постройки здания
     {
         while (building.Percentage < 100)
         {

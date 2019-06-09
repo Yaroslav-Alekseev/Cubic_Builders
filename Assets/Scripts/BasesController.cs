@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class BasesController : MonoBehaviour
 {
+    /// <summary>
+    /// Контролирует площадки под постройку зданий; синглтон
+    /// </summary>
+    
     public Transform[] BasesList;
     [Space]
     public Vector3 DefaultShift = new Vector3(0, -0.9f, 0);
@@ -24,6 +28,7 @@ public class BasesController : MonoBehaviour
 
 
     public GameObject SetBuilding(BuildingType buildingType)
+    //подготовливает площадку под выбранный тип здания
     {
         GameObject prefab;
 
@@ -63,11 +68,13 @@ public class BasesController : MonoBehaviour
     }
 
     public void SetHouse()
+    //публичный метод для UI (подготавливает площадку под дом)
     {
         SetBuilding(BuildingType.house);
     }
 
     public void SetBarn()
+    //публичный метод для UI (подготавливает площадку под амбар)
     {
         SetBuilding(BuildingType.barn);
     }

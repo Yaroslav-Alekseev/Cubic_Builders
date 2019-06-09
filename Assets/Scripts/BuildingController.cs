@@ -5,8 +5,11 @@ using System;
 
 public class BuildingController : Building
 {
+    /// <summary>
+    /// Управляет зданиями, которые могут быть построены (дом/амбар)
+    /// </summary>
 
-    public event Action OnBuildingFinished;
+    public event Action OnBuildingFinished; //событие в конце стройки (Percentage = 100%)
 
 
     private new void Awake()
@@ -25,6 +28,7 @@ public class BuildingController : Building
 
 
     private void OnMouseDown()
+    //назначает строителя на стройку при щелчке по зданию (дому/амбару)
     {
         var builder = BuilderController.SelectedBuilder;
 
@@ -34,6 +38,7 @@ public class BuildingController : Building
 
 
     public void ApplyBuildingProgress(int deltaProgress)
+    //постройка части здания, соответсвующей вложенному труду строителя(-лей)
     {
         Percentage += deltaProgress;
 
@@ -51,7 +56,7 @@ public class BuildingController : Building
         Vector3 finalPos = BasesController.Instance.FinalShift;
 
         float t = Percentage / 100f;
-        transform.localPosition = Vector3.Lerp(startPos, finalPos, t);
+        transform.localPosition = Vector3.Lerp(startPos, finalPos, t); //здание "вырастает" из-под земли
 
         UpdateInfo();
     }
