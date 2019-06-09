@@ -2,48 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
-public enum Direction
-{
-    none,
-    toBuilding,
-    toWarehouse
-}
+using System;
 
 public class BuilderController : MonoBehaviour
 {
-
-    public GameObject Selection;
-    public GameObject MetalCube;
-    public GameObject WoodenCube;
+    public GameObject Selection, MetalCube, WoodenCube;
     public Text BuilderInfo;
-    [Space]
-    public int MetalCapacity = 50;
-    public int WoodCapacity = 100;
-    public int BuildingSpeed = 10;
-    public float MovementSpeed = 0.01f;
-    public string Name = "Строитель##";
-
     [HideInInspector]
     public int Metal, Wood;
-    [HideInInspector]
-    public bool ReturnMaterials = false;
+    public int MetalCapacity, WoodCapacity;
+    public int BuildingSpeed = 10;
+    public float Speed = 0.5f;
+    public string Name = "Строитель##";
 
-    private BuildingController _nextBuilding, _lastBuilding;
-    private WarehouseController _nextWarehouse;
-    private Vector3 _startPoint, _targetPoint;
-    private float _path, _offset;
-    private bool _isMoving;
-    private Direction _direction;
+    public event Action<Building> OnTargetReached;
+
+    public static BuilderController SelectedBuilder;
+
+    private Building _target, _assignedBuilding;
+    private Vector3 _startPoint, _targetPoint, _defaultPos;
+    private float _distanceToTarget, _progress;
     private int _index;
-
-    private static BuilderController _selectedBuilder;
+    private bool _isMoving, _returnMaterials;
 
 
     private void Awake()
     {
-        _direction = Direction.none;
-        _index = Random.Range(0, 1);
+        OnTargetReached += Stop;
+        OnTargetReached += Interact;
+
+        _defaultPos = transform.position;
+        _index = UnityEngine.Random.Range(0, 1);
 
         UpdateInfo();
     }
@@ -53,82 +42,48 @@ public class BuilderController : MonoBehaviour
         MoveBuilder();
     }
 
-    private void OnMouseDown()
+    private void OnDestroy()
     {
-        if (_selectedBuilder != this)
+        OnTargetReached -= Stop;
+        OnTargetReached -= Interact;
+
+        if (_assignedBuilding != null && _assignedBuilding is BuildingController)
         {
-            DeSelectLastBuilder();
-            SelectBuilder();
+            ((BuildingController)_assignedBuilding).OnBuildingFinished -= ReturnToDefaultPos;
+            Debug.Log(Name + ": отписка от " + _assignedBuilding.Name);
         }
     }
 
-    private void SelectBuilder()
+
+    private void OnMouseDown()
     {
-        _selectedBuilder = this;
+        Select();
+    }
+
+    private void Select()
+    {
+        if (SelectedBuilder == this)
+            return;
+
+        DeSelectLastBuilder();
+
+        SelectedBuilder = this;
         Selection.SetActive(true);
-        Debug.Log(this.Name + ": выбран!");
+        Debug.Log(Name + ": выбран");
     }
 
     public static void DeSelectLastBuilder()
     {
-        if (_selectedBuilder == null)
-            return;
-        
-        _selectedBuilder.Selection.SetActive(false);
-        Debug.Log(_selectedBuilder.Name + ": выбор отменён.");
-        _selectedBuilder = null;
-    }
-
-    public static BuilderController GetSelectedBuilder()
-    {
-        return _selectedBuilder;
-    }
-
-    private void MoveBuilder()
-    {
-        if (!_isMoving)
+        if (SelectedBuilder == null)
             return;
 
-        _path += Vector3.Distance(_startPoint, _targetPoint) * MovementSpeed;
-        Vector3 nextPoint = Vector3.Lerp(_startPoint, _targetPoint, _path);
+        string name = SelectedBuilder.Name;
+        SelectedBuilder.Selection.SetActive(false);
+        SelectedBuilder = null;
 
-        float distance = Vector3.Distance(nextPoint, _targetPoint);
-        if (distance > _offset)
-        {
-            transform.position = nextPoint;
-        }
-        else
-        {
-            _isMoving = false;
-            _startPoint = transform.position;
-            _path = 0;
-
-            switch(_direction)
-            {
-                case Direction.toBuilding:
-                    _nextBuilding.Interact(this);
-                    break;
-                case Direction.toWarehouse:
-                    _nextWarehouse.Interact(this, _lastBuilding);
-                    break;
-            }
-        }
+        Debug.Log(name + ": выбор отменён");
     }
 
-    public void GoToBuilding(BuildingController target)
-    {
-        _direction = Direction.toBuilding;
-        _nextBuilding = target;
-
-        _startPoint = transform.position;
-        _targetPoint = target.transform.position;
-        _targetPoint.y = _startPoint.y;
-
-        _offset = target.Offset;
-        _path = 0;
-
-        _isMoving = true;
-    }
 
     public void UpdateInfo()
     {
@@ -142,50 +97,201 @@ public class BuilderController : MonoBehaviour
         WoodenCube.SetActive(Wood > 0);
     }
 
-    public void GoToWarehouse(BuildingController lastBuilding)
+    private void Stop(Building building)
     {
-        _direction = Direction.toWarehouse;
-        _lastBuilding = lastBuilding;
+        _isMoving = false;
+        _progress = 0;
+    }
 
-        _nextWarehouse = GetNextWarehouse();
-        if (_nextWarehouse == null)
-            return;
+    public void AssignToBuilding(Building building)
+    {
+        _returnMaterials = false;
+
+        if (building != _assignedBuilding)
+        {
+            StopBuilding();
+            _assignedBuilding = building;
+        }
+
+        if (Metal == 0 &&  Wood == 0 && !building.IsReady)   //если у строителя нет материалов - идти на склад
+        {
+            var warehouse = GetNextWarehouse();
+            GoToBuilding(warehouse);
+        }
+        else   //если у строителя есть материалы - идти строить
+        {
+            GoToBuilding(building);
+        }
+
+        Debug.Log(string.Format("{0} назначен на постройку {1}а", Name, building.Name.ToLower()));
+    }
+
+    private void GoToBuilding(Building building)
+    {
+        _target = building;
 
         _startPoint = transform.position;
-        _targetPoint = _nextWarehouse.transform.position;
-        _targetPoint.y = _startPoint.y;
+        _targetPoint = building.transform.position;
 
-        _offset = _nextWarehouse.Offset;
-        _path = 0;
+        _distanceToTarget = Vector3.Distance(_startPoint, _targetPoint);
+        _progress = 0;
 
         _isMoving = true;
     }
 
-    public void GoToLastBuilding(BuildingController target)
+    private void TakeMaterials(Building building)
     {
-        GoToBuilding(_lastBuilding);
+        //take metal
+        int metal = MetalCapacity - Metal;
+
+        if (metal > building.Metal)
+            metal = building.Metal;
+
+        Metal += metal;
+        building.Metal -= metal;
+
+        //take wood
+        int wood = WoodCapacity - Wood;
+
+        if (wood > building.Wood)
+            wood = building.Wood;
+
+        Wood += wood;
+        building.Wood -= wood;
+
+        //update info
+        UpdateInfo();
+
+        Debug.Log(string.Format("{0} взял со склада {1} ед. металла и {2} ед. дерева", Name, metal, wood));
     }
 
-    public void StartBuilding(BuildingController building)
+    private void GiveMaterials(Building building)
     {
-        StartCoroutine(BuildingProcess(building));
+        //give metal
+        int metal = building.MetalCapacity - building.Metal;
+
+        if (metal > Metal)
+            metal = Metal;
+
+        Metal -= metal;
+        building.Metal += metal;
+
+        //give wood
+        int wood = building.WoodCapacity - building.Wood;
+
+        if (wood > Wood)
+            wood = Wood;
+
+        Wood -= wood;
+        building.Wood += wood;
+
+        //update info
+        UpdateInfo();
+
+        Debug.Log(string.Format("{0} вложил в {1} {2} ед. металла и {3} ед. дерева", Name, building.Name.ToLower(), metal, wood));
     }
 
-    private void StopBuilding()
+    private void Interact(Building target)
     {
-        StopCoroutine(BuildingProcess(null));
-    }
-
-    private IEnumerator BuildingProcess(BuildingController building)
-    {
-        while (building.GetPercetage() < 100)
+        switch(target.Type)
         {
-            building.ApplyBuildingProgress(BuildingSpeed);
-            yield return new WaitForSecondsRealtime(1f);
+            case BuildingType.warehouse: //склад
+
+                var warehouse = target as WarehouseController;
+
+                if (_returnMaterials)
+                {
+                    GiveMaterials(warehouse);
+                    _returnMaterials = false;
+                }
+                else
+                {
+                    TakeMaterials(warehouse);
+                }
+
+                warehouse.CheckIsEmptyOrNot();
+                warehouse.UpdateInfo();
+
+                GoToBuilding(_assignedBuilding);
+
+                break;
+
+
+            case BuildingType.house: //дом или амбар
+            case BuildingType.barn:
+
+                var building = target as BuildingController;
+
+                GiveMaterials(target);
+                target.UpdateInfo();
+
+                if (target.IsReady)
+                {
+                    if (Metal == 0 && Wood == 0)
+                        StartBuilding(target as BuildingController);
+                    else
+                        ReturnMaterials();
+                }
+                else
+                {
+                    warehouse = GetNextWarehouse();
+                    GoToBuilding(warehouse);
+                }
+                break;
+
+            default: //исходная позиция
+                Debug.Log(Name + " вернулся на исходную позицию.");
+                break;
         }
     }
 
-    private WarehouseController GetNextWarehouse()  
+    private void MoveBuilder()
+    {
+        if (!_isMoving)
+            return;
+
+        _progress += Time.deltaTime * Speed;
+
+        if (_progress > 1)
+            _progress = 1;
+           
+
+        var pos = Vector3.Lerp(_startPoint, _targetPoint, _progress);
+        pos.y = _startPoint.y;
+
+        transform.position = pos;
+
+        float distanceToTarget = Vector3.Distance(transform.position, _targetPoint);
+
+        float offset = 0;
+        if (_target != null)
+            offset = _target.Offset;
+
+        if (distanceToTarget <= offset || _progress == 1)
+        {
+            if (OnTargetReached != null && _target != null)
+                OnTargetReached(_target);
+        }
+    }
+
+    public void ReturnToDefaultPos()
+    {
+        _startPoint = transform.position;
+        _targetPoint = _defaultPos;
+
+        _target = null;
+
+        _isMoving = true;
+    }
+
+    public void ReturnMaterials()
+    {
+        _returnMaterials = true;
+        var warehouse = GetNextWarehouse();
+        GoToBuilding(warehouse);
+    }
+
+    private WarehouseController GetNextWarehouse()
     {
         int maxIndex = WarehousesList.ActiveWarehouses.Count;
         WarehouseController warehouse = null;
@@ -203,6 +309,27 @@ public class BuilderController : MonoBehaviour
         _index++;
 
         return warehouse;
+    }
+
+
+    public void StartBuilding(BuildingController building)
+    {
+        StartCoroutine(BuildingProcess(building));
+        building.OnBuildingFinished += ReturnToDefaultPos;
+    }
+
+    private void StopBuilding()
+    {
+        StopCoroutine(BuildingProcess(null));
+    }
+
+    private IEnumerator BuildingProcess(BuildingController building)
+    {
+        while (building.Percentage < 100)
+        {
+            building.ApplyBuildingProgress(BuildingSpeed);
+            yield return new WaitForSecondsRealtime(1f);
+        }
     }
 
 }

@@ -6,7 +6,8 @@ using UnityEngine;
 public enum BuildingType
 {
     house,
-    barn
+    barn,
+    warehouse
 }
 
 public class Capacity
@@ -22,7 +23,8 @@ public class BuildingsConfig
     private static Dictionary<BuildingType, string> _names = new Dictionary<BuildingType, string>()
     {
         {BuildingType.house, "Дом"},
-        {BuildingType.barn, "Амбар"}
+        {BuildingType.barn, "Амбар"},
+        {BuildingType.warehouse, "Склад"}
     };
 
 

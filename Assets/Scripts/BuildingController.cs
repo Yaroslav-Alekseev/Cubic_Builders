@@ -1,145 +1,59 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using System;
 
-public class BuildingController : MonoBehaviour
+public class BuildingController : Building
 {
 
-    public Text BuildingInfo;
-    public BuildingType Type;
-    public float Offset = 2;
+    public event Action OnBuildingFinished;
 
-    private int _metal, _wood, _percentage;
-    private int _metalCapacity, _woodCapacity;
-    private string _name;
 
-    private void Awake()
+    private new void Awake()
     {
-        _metal = 0;
-        _wood = 0;
-        _percentage = 0;
-
         var capacity = BuildingsConfig.GetCapacity(Type);
-        _metalCapacity = capacity.Metal;
-        _woodCapacity = capacity.Wood;
 
-        _name = BuildingsConfig.GetName(Type);
+        if (capacity != null)
+        {
+            MetalCapacity = capacity.Metal;
+            WoodCapacity = capacity.Wood;
+        }
 
-        UpdateInfo();
+        Name = BuildingsConfig.GetName(Type);
+        base.Awake();
     }
 
 
     private void OnMouseDown()
     {
-        BindBuilder();
+        var builder = BuilderController.SelectedBuilder;
+
+        if (builder != null)
+            builder.AssignToBuilding(this);
     }
 
-    private void UpdateInfo()
-    {
-        string info = _name + "\n";
-        info += string.Format(" - м. {0}/{1};\n", _metal, _metalCapacity);
-        info += string.Format(" - д. {0}/{1};\n", _wood, _woodCapacity);
-        info += string.Format(" (завершён на {0}%)\n", _percentage);
-
-        BuildingInfo.text = info;
-    }
-
-    private void BindBuilder()
-    {
-        var builder = BuilderController.GetSelectedBuilder();
-
-        if (builder == null)
-            return;
-
-        if (_metal < _metalCapacity || _wood < _woodCapacity)
-            builder.GoToWarehouse(this);
-        else
-            builder.GoToBuilding(this);
-
-        Debug.Log(string.Format("{0} назначен строить {1}.", builder.Name, _name.ToLower())); 
-    }
-
-    public void Interact(BuilderController builder)
-    {
-        if (_metal < _metalCapacity && builder.Metal > 0)
-        {
-            int metal = builder.Metal - (_metalCapacity - _metal);
-
-            if (metal < 0)
-                metal = builder.Metal;
-
-            builder.Metal -= metal;
-            _metal += metal;
-
-            if (_metal > _metalCapacity)
-            {
-                builder.Metal += _metal - _metalCapacity;
-                _metal = _metalCapacity;
-            }
-        }
-
-        if (_wood < _woodCapacity && builder.Wood > 0)
-        {
-            int wood = builder.Wood - (_woodCapacity - _wood);
-
-            if (wood < 0)
-                wood = builder.Wood;
-
-            builder.Wood -= wood;
-            _wood += wood;
-
-            if (_wood > _woodCapacity)
-            {
-                builder.Wood += _wood - _woodCapacity;
-                _wood = _woodCapacity;
-            }
-        }
-
-
-        builder.UpdateInfo();
-        UpdateInfo();
-
-        bool buildingIsReady = (_metal == _metalCapacity) && (_wood == _woodCapacity);
-        bool builderIsReady = (builder.Metal == 0) && (builder.Wood == 0);
-
-        if (buildingIsReady && builderIsReady)
-        {
-            builder.StartBuilding(this);
-        }
-        else
-        {
-            if (buildingIsReady)
-                builder.ReturnMaterials = true;
-
-            builder.GoToWarehouse(lastBuilding: this);
-        }
-    }
 
     public void ApplyBuildingProgress(int deltaProgress)
     {
-        _percentage += deltaProgress;
+        Percentage += deltaProgress;
 
-        if (_percentage >= 100)
+        if (Percentage >= 100)
         {
-            _percentage = 100;
-            Debug.Log(string.Format(_name + " построен."));
+            Percentage = 100;
+
+            if (OnBuildingFinished != null)
+                OnBuildingFinished();
+
+            Debug.Log(string.Format(Name + " построен!"));
         }
 
         Vector3 startPos = BasesController.Instance.DefaultShift;
         Vector3 finalPos = BasesController.Instance.FinalShift;
 
-        float t = _percentage / 100f;
+        float t = Percentage / 100f;
         transform.localPosition = Vector3.Lerp(startPos, finalPos, t);
 
         UpdateInfo();
     }
 
-    public int GetPercetage()
-    {
-        return _percentage;
-    }
-
 }
-
-

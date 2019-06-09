@@ -283,9 +283,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9ae6260fd9dbfd4f99837ddb26ec8d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WarehouseInfo: {fileID: 1191023600}
-  MetalCapacity: 400
-  WoodCapacity: 1400
-  Name: "\u0421\u043A\u043B\u0430\u043401"
   Metal: 0
   Wood: 0
+  MetalCapacity: 0
+  WoodCapacity: 0
+  BuildingInfo: {fileID: 1191023600}
+  Offset: 2
+  Type: 2
+  Name: 
+  IsReady: 0

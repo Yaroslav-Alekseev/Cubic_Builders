@@ -62,4 +62,14 @@ public class BasesController : MonoBehaviour
         return building;
     }
 
+    public void SetHouse()
+    {
+        SetBuilding(BuildingType.house);
+    }
+
+    public void SetBarn()
+    {
+        SetBuilding(BuildingType.barn);
+    }
+
 }

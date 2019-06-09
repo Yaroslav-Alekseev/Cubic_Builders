@@ -64,10 +64,10 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\BasesController.cs" />
     <Compile Include="Assets\Scripts\BuilderController.cs" />
+    <Compile Include="Assets\Scripts\Building.cs" />
     <Compile Include="Assets\Scripts\BuildingController.cs" />
     <Compile Include="Assets\Scripts\BuildingsConfig.cs" />
     <Compile Include="Assets\Scripts\GroundController.cs" />
-    <Compile Include="Assets\Scripts\GUIController.cs" />
     <Compile Include="Assets\Scripts\PrefabsCollection.cs" />
     <Compile Include="Assets\Scripts\WarehouseController.cs" />
     <Compile Include="Assets\Scripts\WarehousesList.cs" />

@@ -473,13 +473,12 @@ MonoBehaviour:
   MetalCube: {fileID: 1576273868}
   WoodenCube: {fileID: 320306337}
   BuilderInfo: {fileID: 603029329}
-  MetalCapacity: 50
-  WoodCapacity: 100
-  BuildingSpeed: 10
-  MovementSpeed: 0.1
-  Name: Builder##
   Metal: 0
   Wood: 0
+  MetalCapacity: 50
+  WoodCapacity: 100
+  Speed: 0.5
+  Name: "\u0421\u0442\u0440\u043E\u0438\u0442\u0435\u043B\u044C##"
 --- !u!1001 &8869343556569586769
 PrefabInstance:
   m_ObjectHideFlags: 0
