@@ -235,6 +235,16 @@ public class BuilderController : MonoBehaviour
 
                 var building = target as BuildingController;
 
+                if (building.IsFinished) //возвращается на исходную позицию/склад, если стройка была завершена, пока он нёс материалы
+                {
+                    if (Metal == 0 && Wood == 0)
+                        ReturnToDefaultPos(); //на исходную поз.
+                    else
+                        ReturnMaterials(); //на склад
+
+                    break;
+                }
+
                 GiveMaterials(target); //вкладывает матералы в стройку (дома/амбара)
                 target.UpdateInfo();
 

@@ -9,6 +9,10 @@ public class BuildingController : Building
     /// Управляет зданиями, которые могут быть построены (дом/амбар)
     /// </summary>
 
+
+    [HideInInspector]
+    public bool IsFinished;
+
     public event Action OnBuildingFinished; //событие в конце стройки (Percentage = 100%)
 
 
@@ -23,6 +27,7 @@ public class BuildingController : Building
         }
 
         Name = BuildingsConfig.GetName(Type);
+        IsFinished = false;
         base.Awake();
     }
 
@@ -33,7 +38,16 @@ public class BuildingController : Building
         var builder = BuilderController.SelectedBuilder;
 
         if (builder != null)
-            builder.AssignToBuilding(this);
+        {
+            if (!IsFinished)
+            {
+                builder.AssignToBuilding(this);
+            }
+            else
+            {
+                Debug.Log(Name + " завершён на 100% - рабочий не требуется.");
+            }
+        }
     }
 
 
@@ -48,6 +62,8 @@ public class BuildingController : Building
 
             if (OnBuildingFinished != null)
                 OnBuildingFinished();
+
+            IsFinished = true;
 
             Debug.Log(string.Format(Name + " построен!"));
         }
